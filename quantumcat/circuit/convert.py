@@ -16,7 +16,6 @@ from qiskit import QuantumCircuit
 from quantumcat.utils import gates_map
 from quantumcat.circuit.op_type import OpType
 from quantumcat.utils import constants, helper
-import cirq
 import inspect
 
 
@@ -27,6 +26,7 @@ def to_qiskit(q_circuit, qubits, cbits):
     :param cbits: number of classical bits for measurement
     :return: qiskit quantumcircuit object
     """
+    import cirq
     operations = q_circuit.operations
     qiskit_qc = QuantumCircuit(qubits, cbits)
     for op in operations:

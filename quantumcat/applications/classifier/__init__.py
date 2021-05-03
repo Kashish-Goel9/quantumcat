@@ -13,3 +13,5 @@
 #  limitations under the License.
 
 
+from quantumcat.applications.classifier.classifier_circuit import ClassifierCircuit
+from quantumcat.applications.classifier.torch_circuit import Net
