@@ -132,3 +132,4 @@ dmypy.json
 .idea/*
 
 quantumcat/mnistdata
+quantumcat/data
