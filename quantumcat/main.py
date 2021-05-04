@@ -110,7 +110,7 @@ def qml_demo():
         print('Training [{:.0f}%]\tLoss: {:.4f}'.format(100. * (epoch + 1) / epochs, loss_list[-1]))
 
     # Normalise the loss between 0 and 1
-    print("Training finished, took {:.2f}s  after epoch #{:2d}".format(time() - time0,epochs))
+    print("Training finished, took {:.2f}s  after epoch #{:2d}".format(time.time() - time0,epochs))
 
     for i in range(len(loss_list)):
         loss_list[i] += 1
