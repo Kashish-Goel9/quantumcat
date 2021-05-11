@@ -16,7 +16,7 @@
 from quantumcat.circuit import QCircuit
 import numpy as np
 from quantumcat.utils import helper
-
+from quantumcat.utils import providers
 
 class ClassifierCircuit:
     """
@@ -26,7 +26,7 @@ class ClassifierCircuit:
 
     def __init__(self, n_qubits):
         super(ClassifierCircuit, self).__init__()
-        self.circuit = QCircuit(n_qubits)
+        self.circuit = QCircuit(n_qubits, n_qubits)
         self.theta = ''
         self.all_qubits = [i for i in range(n_qubits)]
 
@@ -44,10 +44,10 @@ class ClassifierCircuit:
         for qubit in self.all_qubits:
             self.circuit.h_gate(qubit)
             self.circuit.ry_gate(self.theta, qubit)
-            self.circuit.measure(qubit, 0)
+            self.circuit.measure(qubit, qubit)
 
-    def run(self, i):
+    def run(self, i, provider=providers.DEFAULT_PROVIDER):
         self.bind(i)
         rep = 1000
-        counts = self.circuit.execute(repetitions=rep)
+        counts = self.circuit.execute(provider = provider, repetitions=rep)
         return self.N_qubit_expectation_Z(counts, rep, 1)

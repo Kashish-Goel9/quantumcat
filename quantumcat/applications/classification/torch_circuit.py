@@ -17,19 +17,20 @@ import torch
 from torch.autograd import Function
 import torch.nn as nn
 import torch.nn.functional as F
-from quantumcat.applications.classifier import ClassifierCircuit
+from quantumcat.applications.classification import ClassifierCircuit
 from quantumcat.utils import helper
 import numpy as np
+from quantumcat.utils import providers
 
 
 class TorchCircuit(Function):
 
     @staticmethod
     def forward(ctx, i):
-        if not hasattr(ctx, 'QiskitCirc'):
-            ctx.QiskitCirc = ClassifierCircuit(1)
+        if not hasattr(ctx, 'Circuit'):
+            ctx.Circuit = ClassifierCircuit(1)
 
-        exp_value = ctx.QiskitCirc.run(i[0])
+        exp_value = ctx.Circuit.run(i[0], prov)
 
         result = torch.tensor([exp_value]) # store the result as a torch tensor
 
@@ -52,13 +53,13 @@ class TorchCircuit(Function):
             input_plus_s = input_numbers
             input_plus_s[k] = input_numbers[k] + s  # Shift up by s
 
-            exp_value_plus = ctx.QiskitCirc.run(torch.tensor(input_plus_s))[0]
+            exp_value_plus = ctx.Circuit.run(torch.tensor(input_plus_s), prov)[0]
             result_plus_s = torch.tensor([exp_value_plus])
 
             input_minus_s = input_numbers
             input_minus_s[k] = input_numbers[k] - s # Shift down by s
 
-            exp_value_minus = ctx.QiskitCirc.run(torch.tensor(input_minus_s))[0]
+            exp_value_minus = ctx.Circuit.run(torch.tensor(input_minus_s), prov)[0]
             result_minus_s = torch.tensor([exp_value_minus])
 
             gradient_result = (result_plus_s - result_minus_s)
@@ -71,7 +72,15 @@ class TorchCircuit(Function):
 
 
 qc = TorchCircuit.apply
+prov = providers.DEFAULT_PROVIDER
 
+
+class Provider:
+
+    def __init__(self, provider1=providers.DEFAULT_PROVIDER):
+        super(Provider, self).__init__()
+        global prov
+        prov = provider1
 
 class Net(nn.Module):
     def __init__(self):
@@ -81,6 +90,7 @@ class Net(nn.Module):
         self.conv2_drop = nn.Dropout2d()
         self.h1 = nn.Linear(320, 50)
         self.h2 = nn.Linear(50, 1)
+
 
     def forward(self, x):
         x = F.relu(F.max_pool2d(self.conv1(x), 2))
